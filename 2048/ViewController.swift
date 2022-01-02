@@ -43,12 +43,17 @@ class ViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+
         holder.backgroundColor = .black
-        gameScreen()
+        gameScreenInMain()
 
     }
    
-    
+    private func gameScreenInMain() {
+        DispatchQueue.main.async {
+            self.gameScreen()
+        }
+    }
     private  func gameScreen(){
         newNumber()
         let boxSize : CGFloat = holder.frame.size.width / 4;
@@ -134,7 +139,7 @@ class ViewController: UIViewController {
                 }
             }
         }
-        gameScreen()
+        gameScreenInMain()
     }
     
     // for right swipe gesture
@@ -167,7 +172,7 @@ class ViewController: UIViewController {
             }
         }
         
-        gameScreen()
+        gameScreenInMain()
     }
     
     // for up swipe gesture
@@ -201,7 +206,7 @@ class ViewController: UIViewController {
             }
         }
         
-        gameScreen()
+        gameScreenInMain()
     }
     
     // for bottom swipe
@@ -234,11 +239,11 @@ class ViewController: UIViewController {
             }
         }
 
-        gameScreen()
+        gameScreenInMain()
     }
     
     @objc func autoGestures(_ sender : UIButton){
-        DispatchQueue.main.async {
+        DispatchQueue.global(qos: .background).async {
             self.detectEndGame()
             while  self.endGame == false{
                 let autoGesture = Int.random(in: 0...3)
@@ -255,7 +260,9 @@ class ViewController: UIViewController {
                         self.gameEnded()
                         
                 }
+                sleep(1)
             }
+            self.gameEnded()
         }
 
     }
@@ -274,6 +281,7 @@ class ViewController: UIViewController {
             for j in 0...2{
                 if matrix[i][j] == matrix[i][j+1]{
                     endGame = false
+                    return
                 }
             }
             
@@ -283,6 +291,7 @@ class ViewController: UIViewController {
             for i in 0...2{
                 if matrix[i][j] == matrix[i+1][j]{
                     endGame = false
+                    return
                 }
             }
             
@@ -292,9 +301,12 @@ class ViewController: UIViewController {
             for k in 0...3{
                 if matrix[i][k] == 0{
                     endGame = false
+                    return
                 }
             }
         }
+        endGame = true
+        return
         
     }
     
