@@ -43,9 +43,9 @@ class ViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        holder.backgroundColor = .white
+
+        holder.backgroundColor = .black
         gameScreenInMain()
-        
 
     }
    
@@ -58,17 +58,20 @@ class ViewController: UIViewController {
         newNumber()
         let boxSize : CGFloat = holder.frame.size.width / 4;
         
+        let backView = UIView(frame: CGRect(x: 0, y: 200, width: boxSize * 4, height: boxSize * 4))
+        backView.backgroundColor = .black
+        
         
         let autoGestureButton = UIButton(frame: CGRect(x: 10, y: 10, width: boxSize + 50, height: boxSize - 30))
         autoGestureButton.setTitle("AUTOPLAY", for: .normal)
-        autoGestureButton.setTitleColor(.green, for: .normal)
-        autoGestureButton.backgroundColor = .lightGray
+        autoGestureButton.setTitleColor(.black, for: .normal)
+        autoGestureButton.backgroundColor = .orange
         autoGestureButton.addTarget(self, action: #selector(autoGestures(_:)), for: .touchUpInside)
         holder.addSubview(autoGestureButton)
         
         for i in 0..<4{
             for j in 0..<4{
-                let box1 = UILabel(frame: CGRect(x: CGFloat(j) * boxSize, y: boxSize * CGFloat(i) + 200, width: boxSize, height: boxSize))
+                let box1 = UILabel(frame: CGRect(x: CGFloat(j) * boxSize, y: boxSize * CGFloat(i) + 200, width: boxSize - 5, height: boxSize - 5))
                 box1.textColor = .black
                 box1.backgroundColor = .lightGray
                 box1.textAlignment = .center
@@ -77,11 +80,11 @@ class ViewController: UIViewController {
             }
         }
         
-        let scoreLabel = UILabel(frame: CGRect(x: 210, y: 100, width: boxSize + 5, height: boxSize - 30))
-        scoreLabel.textColor = .white
+        let scoreLabel = UILabel(frame: CGRect(x: 210, y: 100, width: boxSize + 10, height: boxSize - 30))
+        scoreLabel.textColor = .black
         scoreLabel.text = "score : \(updatedScore)"
         scoreLabel.font = UIFont(name: "Arial ", size: 20)
-        scoreLabel.backgroundColor = .lightGray
+        scoreLabel.backgroundColor = .orange
         holder.addSubview(scoreLabel)
         
         let mainLabel = UILabel(frame: CGRect(x: 10, y: 30, width: boxSize + 100, height: boxSize + 100))
@@ -307,16 +310,6 @@ class ViewController: UIViewController {
         
     }
     
-//    private func updateScore() -> Int{
-//        for i in 0...3{
-//            for j in 0...3{
-//                if matrix[i][j] > 2{
-//                    updatedScore = updatedScore + matrix[i][j]
-//                }
-//            }
-//        }
-//        return updatedScore
-//    }
 
 
 }
