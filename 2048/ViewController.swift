@@ -14,8 +14,27 @@ class ViewController: UIViewController {
     var endGame : Bool = true
     
     
+
     var matrix : [[Int]] = [[0,0,0,0] , [0,0,0,0] , [0,0,0,0] , [0,0,0,0]]
     var updatedScore = 0
+    var autoPlayButton : UIButton = {
+        let button = UIButton(frame: CGRect(x: 205, y: 50, width: 100, height: 30))
+        button.setTitle("AUTOPLAY", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .lightGray
+        button.titleLabel?.font = UIFont(name: "Arial", size: 15)
+        button.addTarget(self, action: #selector(autoGestures(_:)), for: .touchUpInside)
+        return button
+    }()
+    
+    var  gameEndLabel : UILabel = {
+        let label = UILabel(frame: CGRect(x: 100, y: 10, width: 120, height:  50))
+        label.text = "game not ended"
+        label.font = UIFont(name: "Arial", size: 20)
+        label.textColor = .white
+        return label
+    }()
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,7 +63,7 @@ class ViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
-        holder.backgroundColor = .black
+        holder.backgroundColor = .clear
         gameScreenInMain()
 
     }
@@ -58,54 +77,92 @@ class ViewController: UIViewController {
         newNumber()
         let boxSize : CGFloat = holder.frame.size.width / 4;
         
-        let backView = UIView(frame: CGRect(x: 0, y: 200, width: boxSize * 4, height: boxSize * 4))
-        backView.backgroundColor = .black
+        let backView = UIView(frame: CGRect(x: 0, y: 200, width: boxSize * 4 + 5, height: boxSize * 4 + 4))
+        backView.backgroundColor = .lightGray
+        holder.addSubview(backView)
         
         
-        let autoGestureButton = UIButton(frame: CGRect(x: 10, y: 10, width: boxSize + 50, height: boxSize - 30))
-        autoGestureButton.setTitle("AUTOPLAY", for: .normal)
-        autoGestureButton.setTitleColor(.black, for: .normal)
-        autoGestureButton.backgroundColor = .orange
-        autoGestureButton.addTarget(self, action: #selector(autoGestures(_:)), for: .touchUpInside)
-        holder.addSubview(autoGestureButton)
+//        autoPlayButton.setTitle("AUTOPLAY", for: .normal)
+//        autoPlayButton.setTitleColor(.black, for: .normal)
+//        autoPlayButton.backgroundColor = .orange
+//        autoPlayButton.addTarget(self, action: #selector(autoGestures(_:)), for: .touchUpInside)
+        holder.addSubview(autoPlayButton)
         
         for i in 0..<4{
             for j in 0..<4{
-                let box1 = UILabel(frame: CGRect(x: CGFloat(j) * boxSize, y: boxSize * CGFloat(i) + 200, width: boxSize - 5, height: boxSize - 5))
+                let box1 = UILabel(frame: CGRect(x: CGFloat(j) * boxSize + 3, y: boxSize * CGFloat(i) + 206, width: boxSize - 7, height: boxSize - 7))
                 box1.textColor = .black
-                box1.backgroundColor = .lightGray
+                box1.backgroundColor = colourAssign(number: matrix[i][j])
                 box1.textAlignment = .center
-                box1.text = "\(matrix[i][j])"
+                if matrix[i][j] == 0{
+                    box1.text = ""
+                }
+                else{
+                    box1.text = "\(matrix[i][j])"
+                }
                 holder.addSubview(box1)
             }
         }
         
         let scoreLabel = UILabel(frame: CGRect(x: 210, y: 100, width: boxSize + 10, height: boxSize - 30))
-        scoreLabel.textColor = .black
+        scoreLabel.textColor = .white
         scoreLabel.text = "score : \(updatedScore)"
-        scoreLabel.font = UIFont(name: "Arial ", size: 20)
-        scoreLabel.backgroundColor = .orange
+        scoreLabel.font = UIFont(name: "Arial ", size: 10)
+        scoreLabel.backgroundColor = .lightGray
+        scoreLabel.textAlignment = .center
         holder.addSubview(scoreLabel)
         
-        let mainLabel = UILabel(frame: CGRect(x: 10, y: 30, width: boxSize + 100, height: boxSize + 100))
+        let mainLabel = UILabel(frame: CGRect(x: 10, y: 0, width: boxSize + 100, height: boxSize + 100))
         mainLabel.text = "2048"
         mainLabel.font = UIFont(name: "Arial", size: 50)
         mainLabel.textColor = .lightGray
         holder.addSubview(mainLabel)
+        
+        holder.addSubview(gameEndLabel)
+
+    }
+    
+    // to give diff colours to blocks based on their number
+    
+    private func colourAssign(number : Int) -> UIColor{
+        
+            let base = 0xf0ddc9
+            let high = 0xf07e05
+            var currcolour = base
+            let increment = (high - base)/100
+            var x = 1
+            if number != 0{
+                while number >= 2^x{
+                    x += 1
+                }
+            }
+            currcolour = base - increment * x
+            
+            return UIColor(
+                red: CGFloat((currcolour & 0xFF0000) >> 16) / 255.0,
+                green:CGFloat((currcolour & 0x00FF00) >> 8) / 255.0 ,
+                blue: CGFloat(currcolour & 0x0000FF) / 255.0,
+                alpha: CGFloat(1.0)
+            )
+        
+        
     }
     
     // to assign 2 at random spots    ??? how to assign 2 at random two positions in beginning
 
-    @objc func newNumber(){
-        var numberGenerated : Bool = false
-        while numberGenerated == false{
-            let i = Int.random(in: 0...3)
-            let j = Int.random(in: 0...3)
-            if matrix[i][j] == 0{
-                matrix[i][j] = 2
-                numberGenerated = true
+    private func newNumber(){
+        DispatchQueue.global(qos: .background).async {                                      //**********
+            var numberGenerated : Bool = false
+            while numberGenerated == false{
+                let i = Int.random(in: 0...3)
+                let j = Int.random(in: 0...3)
+                if self.self.matrix[i][j] == 0{
+                    self.self.matrix[i][j] = 2
+                    numberGenerated = true
+                }
             }
         }
+        
     }
     
     
@@ -232,7 +289,7 @@ class ViewController: UIViewController {
                             matrix[k][j] = 0
                         }
                         else{
-                            matrix[k][j] = matrix[k-1][j]
+                             matrix[k][j] = matrix[k-1][j]
                         }
                     }
                 }
@@ -245,23 +302,32 @@ class ViewController: UIViewController {
     @objc func autoGestures(_ sender : UIButton){
         DispatchQueue.global(qos: .background).async {
             self.detectEndGame()
+            var counter = 0
+            var prevnum = 5
             while  self.endGame == false{
                 let autoGesture = Int.random(in: 0...3)
-                switch autoGesture{
-                    case 0:
-                        self.leftSwipe()
-                    case 1:
-                        self.rightSwipe()
-                    case 2:
-                        self.upSwipe()
-                    case 3:
-                        self.bottomSwipe()
-                    default:
-                        self.gameEnded()
-                        
+                if prevnum != autoGesture{
+                     prevnum = autoGesture
+                    switch autoGesture{
+                        case 0:
+                            self.leftSwipe()
+                        case 1:
+                            self.rightSwipe()
+                        case 2:
+                            self.upSwipe()
+                        case 3:
+                            self.bottomSwipe()
+                        default:
+                            self.gameEnded()
+                            
+                    }
                 }
-                sleep(1)
+                counter += 1
+                print("inside while loop \(counter)")
+                usleep(100000)
+                self.detectEndGame()
             }
+            print("game ended")
             self.gameEnded()
         }
 
@@ -271,7 +337,15 @@ class ViewController: UIViewController {
     @objc func gameEnded(){
         detectEndGame()
         if endGame == true{
-            view.backgroundColor = .black
+            DispatchQueue.main.async {
+//                self.autoPlayButton.setTitle("GAME ENDED!", for: .normal)
+//                self.autoPlayButton.setTitleColor(.black, for: .normal)
+//                self.autoPlayButton.backgroundColor = .red
+                self.gameEndLabel.text = "GAME OVER!"
+                self.gameEndLabel.font = UIFont(name: "Arial", size: 15)
+                self.gameEndLabel.textColor = .red
+                
+            }
         }
     }
     
@@ -315,6 +389,11 @@ class ViewController: UIViewController {
 }
 
 
-// end game detect. display game over
-// auto play button
-// score update
+// to do -
+// dont pick same num again
+
+
+// blank if 0
+
+// why autplay declaration inside  gamescreen doesnt work
+//score label
